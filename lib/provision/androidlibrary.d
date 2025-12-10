@@ -378,7 +378,16 @@ AndroidLibrary memoryOwner(size_t address) {
     return null;
 }
 
-version (linux) {
+version(Android) {
+    pragma(LDC_intrinsic, "llvm.returnaddress")
+    ubyte* return_address(int);
+
+    import core.sys.windows.stacktrace;
+    pragma(inline, true) AndroidLibrary rootLibrary(ubyte* address = return_address(0)) {
+        assert(address != null);
+        return memoryOwner(cast(size_t) address);
+    }
+} else version (linux) {
     import core.sys.linux.execinfo;
     pragma(inline, true) AndroidLibrary rootLibrary() {
         enum MAXFRAMES = 4;
