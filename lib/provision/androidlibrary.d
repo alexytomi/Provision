@@ -387,14 +387,6 @@ version(Android) {
         assert(address != null);
         return memoryOwner(cast(size_t) address);
     }
-} else version (linux) {
-    import core.sys.linux.execinfo;
-    pragma(inline, true) AndroidLibrary rootLibrary() {
-        enum MAXFRAMES = 4;
-        void*[MAXFRAMES] callstack;
-        auto numframes = backtrace(callstack.ptr, MAXFRAMES);
-        return memoryOwner(cast(size_t) callstack[numframes - 1]);
-    }
 } else version (LDC) { // Seems to work consistently, but LLVM only.
     pragma(LDC_intrinsic, "llvm.returnaddress")
     ubyte* return_address(int);
